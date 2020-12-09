@@ -992,7 +992,18 @@ bool CBlock::ReadFromDisk(const CBlockIndex* pindex, bool fReadTransactions)
         return error("CBlock::ReadFromDisk() : GetHash() doesn't match index");
     return true;
 }
+bool CBlock::DelFromDisk(uint256& hash)
+{
+    CTxDB txdb;
+    
+    return txdb.DeleteHashBlockIndex(hash);
+}
+bool CBlock::SetBestChains(CBlockIndex* pblockindex)
+{
+    CTxDB txdb;
+    return SetBestChainInner(txdb,pblockindex);
 
+}
 uint256 static GetOrphanRoot(const uint256& hash)
 {
     map<uint256, COrphanBlock*>::iterator it = mapOrphanBlocks.find(hash);

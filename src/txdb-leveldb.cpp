@@ -261,6 +261,16 @@ bool CTxDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
 {
     return Write(make_pair(string("blockindex"), blockindex.GetBlockHash()), blockindex);
 }
+bool CTxDB::DeleteHashBlockIndex(uint256& hash)
+{
+    if(Erase(make_pair(string("blockindex"), hash)))
+    {
+    	LogPrintf("delete ok hash=%s\n",hash.ToString());
+	return true;
+    }else{
+    	return false;
+    }
+}
 
 bool CTxDB::ReadHashBestChain(uint256& hashBestChain)
 {

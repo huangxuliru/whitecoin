@@ -274,6 +274,35 @@ Value getblockbynumber(const Array& params, bool fHelp)
     return blockToJSON(block, pblockindex, params.size() > 1 ? params[1].get_bool() : false);
 }
 
+Value delblockbynumber(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 2)
+        throw runtime_error(
+            "delblockbynumber <number> [txinfo]\n"
+            "txinfo optional to print more detailed tx info\n"
+            "Returns details of a block with given block-number.");
+
+    int nHeight = params[0].get_int();
+    if (nHeight < 0 || nHeight > nBestHeight)
+        throw runtime_error("Block number out of range.");
+
+    CBlock block;
+    CBlockIndex* pblockindex = mapBlockIndex[hashBestChain];
+    int num=1;
+    while (pblockindex->nHeight > nHeight){
+        
+	uint256 hash = *pblockindex->phashBlock;
+	pblockindex = pblockindex->pprev; 
+	if(block.DelFromDisk(hash))
+            num++;
+    } 
+    block.SetBestChains(pblockindex->pnext);
+    
+    nBestHeight = nHeight;
+    return num;
+    //return blockToJSON(block, pblockindex, params.size() > 1 ? params[1].get_bool() : false);
+}
+
 // ppcoin: get information of sync-checkpoint
 Value getcheckpoint(const Array& params, bool fHelp)
 {
